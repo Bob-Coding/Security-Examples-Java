@@ -13,6 +13,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
+                .antMatchers("/api", "/api/users")
+                .permitAll()                     //grants access to routes "/api" and "/api/user" without authentication
                 .anyRequest()
                 .authenticated()
                 .and()
