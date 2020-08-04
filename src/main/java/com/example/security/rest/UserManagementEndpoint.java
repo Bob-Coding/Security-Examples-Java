@@ -13,7 +13,7 @@ public class UserManagementEndpoint {
     UserService us;
 
     @GetMapping("/users")
-    @PreAuthorize("HasAnyRole('ROLE_ADMIN', 'ROLE_ADMINTRAINEE')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_ADMINTRAINEE')")
     public Iterable <User> getAllUsers() {
         return us.getAllUsers();
     }

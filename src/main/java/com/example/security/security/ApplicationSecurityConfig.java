@@ -31,6 +31,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                //.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                // .and()                   if you want to connect you frontend, because usage of postman you want to disable
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api", "/api/users").permitAll()                 //grants access to routes "/api" and "/api/user" without authentication
