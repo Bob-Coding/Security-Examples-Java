@@ -28,7 +28,7 @@ public class UserService {
 		}
 	}
 
-	public User addUser(User newUser) {
+	public User registerNewUser(User newUser) {
 		System.out.println("You Added A New User");
 		return ur.save(newUser);
 	}
