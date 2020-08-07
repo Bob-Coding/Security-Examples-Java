@@ -1,22 +1,21 @@
 package com.example.security.security;
 
+import com.example.security.auth.ApplicationUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.example.security.security.ApplicationUserRole.*;
+import static com.example.security.security.ApplicationUserRole.STUDENT;
 
 
 @Configuration
@@ -25,10 +24,12 @@ import static com.example.security.security.ApplicationUserRole.*;
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationUserService applicationUserService;
 
     @Autowired
-    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder) {
+    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder, ApplicationUserService applicationUserService) {
         this.passwordEncoder = passwordEncoder;
+        this.applicationUserService = applicationUserService;
     }                                                                       // Enable Password encoder from PasswordConfig(BCrypt)
 
     @Override
@@ -68,28 +69,16 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    @Bean
-    protected UserDetailsService userDetailsService() {                     //Service how you retrieve your users from the database
-        UserDetails bobUser = User.builder()                                //For now we create a new user instead of retrieving from database
-                .username("bob")
-                .password(passwordEncoder.encode("password1"))  //Encode password
-//                .roles(ADMIN.name())                     //ROLE_ADMIN authentication role
-                .authorities(ADMIN.getGrantedAuthorities())
-                .build();
-
-        UserDetails robUser = User.builder()                                //For now we create a new user instead of retrieving from database
-                .username("rob")
-                .password(passwordEncoder.encode("password2"))  //Encode password
-//                .roles(ADMINTRAINEE.name())                     //ROLE_ADMIN authentication role
-                .authorities(ADMINTRAINEE.getGrantedAuthorities())
-                .build();
-
-        UserDetails robertUser = User.builder()                             //For now we create a new user instead of retrieving from database
-                .username("robert")
-                .password(passwordEncoder.encode("password3")) //Encode password
-//                .roles(STUDENT.name())                                      //ROLE_STUDENT if there's no static import from ApplicationUserRole, you use ApplicationUserRole.ADMIN.name()
-                .authorities(STUDENT.getGrantedAuthorities())
-                .build();
-        return new InMemoryUserDetailsManager(bobUser, robertUser, robUser);
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(daoAuthenticationProvider());
     }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder);
+        provider.setUserDetailsService(applicationUserService);
+        return provider;
+    }
+
 }
