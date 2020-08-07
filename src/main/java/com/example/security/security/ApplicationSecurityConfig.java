@@ -48,12 +48,15 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login").permitAll()
-                .defaultSuccessUrl("/dashboard", true)   //adds a redirect after succesful login
+                    .loginPage("/login").permitAll()
+                    .defaultSuccessUrl("/dashboard", true)   //adds a redirect after succesful login
+                    .usernameParameter("username")          //same as default but if you want to change the inputnames in login you can
+                    .passwordParameter("password")
                 .and()
                 .rememberMe()                           //when added a input remember-me it takes a session login as default for 2 weeks, sends it from frontend with the user logininfo to backend
                     .tokenValiditySeconds((int)TimeUnit.DAYS.toSeconds(21))
                     .key("somethingverysecured")
+                    .rememberMeParameter("remember-me")         //same as default
                 .and()
                 .logout()
                     .logoutUrl("/logout")
