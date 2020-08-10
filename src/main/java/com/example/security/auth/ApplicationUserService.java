@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public class ApplicationUserService implements UserDetailsService {
 
-
+    @Service
     private final ApplicationUserDao applicationUserDao;
 
     @Autowired
